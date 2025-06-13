@@ -124,7 +124,6 @@ def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str) -> None:
         return
 
     fieldnames = ["text", "author", "tags"]
-
     try:
         with open(
                 output_csv_path,
@@ -147,7 +146,6 @@ def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str) -> None:
         print(f"Error writing to CSV file {output_csv_path}: {e}")
     except Exception as e:
         print(f"An unexpected error occurred while writing CSV: {e}")
-
 
 
 def main(output_csv_path: str) -> None:
