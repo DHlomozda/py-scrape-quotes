@@ -149,6 +149,7 @@ def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str) -> None:
         print(f"An unexpected error occurred while writing CSV: {e}")
 
 
+
 def main(output_csv_path: str) -> None:
     quotes = scrape_all_quotes()
     if quotes:
