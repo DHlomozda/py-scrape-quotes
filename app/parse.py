@@ -138,7 +138,7 @@ def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str) -> None:
                 writer.writerow({
                     "text": quote.text,
                     "author": quote.author,
-                    "tags": quote.tags
+                    "tags": ", ".join(quote.tags)
                 })
 
         print(f"Successfully wrote {len(quotes)} quotes to {output_csv_path}")
