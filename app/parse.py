@@ -38,20 +38,22 @@ def parse_quotes_from_page(html_content: str) -> List[Quote]:
     Parses quotes from the given HTML content
     Extracts text, author, and tags for each quote.
     """
-    soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(html_content, "html.parser")
     quotes: List[Quote] = []
 
-    for quote_div in soup.find_all('div', class_='quote'):
-        text_element = quote_div.find('span', class_='text')
+    for quote_div in soup.find_all("div", class_="quote"):
+        text_element = quote_div.find("span", class_="text")
         text = text_element.get_text(strip=True) if text_element else "N/A"
 
-        author_element = quote_div.find('small', class_='author')
-        author = author_element.get_text(strip=True) if author_element else "N/A"
+        author_element = quote_div.find("small", class_="author")
+        author = author_element.get_text(
+            strip=True
+        ) if author_element else "N/A"
 
-        tags_elements_container = quote_div.find('div', class_='tags')
+        tags_elements_container = quote_div.find("div", class_="tags")
         tags = []
         if tags_elements_container:
-            for tag_a in tags_elements_container.find_all('a', class_='tag'):
+            for tag_a in tags_elements_container.find_all("a", class_="tag"):
                 tags.append(tag_a.get_text(strip=True))
 
         quotes.append(Quote(text, author, tags))
@@ -72,15 +74,18 @@ def page_generator(start_url: str) -> Generator[BeautifulSoup, None, None]:
         html_content = fetch_page_content(current_url)
 
         if not html_content:
-            print(f"Failed to fetch content for page {page_num}, stopping pagination.")
+            print(
+                f"Failed to fetch content for page {page_num}, "
+                f"stopping pagination."
+            )
             break
 
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, "html.parser")
         yield soup
 
-        next_li = soup.find('li', class_='next')
-        if next_li and next_li.find('a'):
-            relative_url = next_li.find('a')['href']
+        next_li = soup.find("li", class_="next")
+        if next_li and next_li.find("a"):
+            relative_url = next_li.find("a")["href"]
             current_url = urljoin(start_url, relative_url)
             page_num += 1
         else:
@@ -89,12 +94,16 @@ def page_generator(start_url: str) -> Generator[BeautifulSoup, None, None]:
 
 def scrape_all_quotes() -> List[Quote]:
     """
-    Orchestrates the scraping of all quotes from the website, handling pagination.
+    Orchestrates the scraping of all quotes from the website,
+    handling pagination.
     Uses a page generator for efficient processing.
     """
     all_quotes: List[Quote] = []
 
-    for page_soup in tqdm(page_generator(BASE_URL), desc="Scraping Quotes Pages"):
+    for page_soup in tqdm(
+            page_generator(BASE_URL),
+            desc="Scraping Quotes Pages"
+    ):
         quotes_on_page = parse_quotes_from_page(page_soup.prettify())
         all_quotes.extend(quotes_on_page)
 
@@ -102,18 +111,27 @@ def scrape_all_quotes() -> List[Quote]:
     return all_quotes
 
 
-def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str):
+def write_quotes_to_csv(quotes: List[Quote], output_csv_path: str) -> None:
     """
     Writes a list of Quote objects to a CSV file.
     """
     if not quotes:
-        print("No quotes to write to CSV. The CSV file will not be created or will be empty if it already exists.")
+        print(
+            "No quotes to write to CSV. "
+            "The CSV file will not be created or "
+            "will be empty if it already exists."
+        )
         return
 
     fieldnames = ["text", "author", "tags"]
 
     try:
-        with open(output_csv_path, 'w', newline='', encoding='utf-8') as csvfile:
+        with open(
+                output_csv_path,
+                "w",
+                newline="",
+                encoding="utf-8"
+        ) as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
@@ -136,7 +154,10 @@ def main(output_csv_path: str) -> None:
     if quotes:
         write_quotes_to_csv(quotes, output_csv_path)
     else:
-        print("No quotes were scraped. CSV file will not be created or will be empty.")
+        print(
+            "No quotes were scraped. "
+            "CSV file will not be created or will be empty."
+        )
 
 
 if __name__ == "__main__":
